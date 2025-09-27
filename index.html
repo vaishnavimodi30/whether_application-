@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App 🌤️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Global Styles */
+        
+        body {
+            margin: 0;
+            font-family: "Poppins", sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(to top, #0f2027, #203a43, #2c5364);
+            /* Dark blue gradient */
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+        
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        /* Clouds and sun */
+        
+        .cloud,
+        .sun {
+            position: absolute;
+            border-radius: 50%;
+        }
+        
+        .cloud {
+            background: rgba(255, 255, 255, 0.7);
+            width: 120px;
+            height: 60px;
+            top: 20%;
+            left: -150px;
+            animation: moveCloud 40s linear infinite;
+        }
+        
+        .cloud::after,
+        .cloud::before {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.7);
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+        }
+        
+        .cloud::before {
+            top: -25px;
+            left: 15px;
+        }
+        
+        .cloud::after {
+            top: -20px;
+            left: 50px;
+        }
+        
+        @keyframes moveCloud {
+            0% {
+                left: -150px;
+            }
+            100% {
+                left: 110%;
+            }
+        }
+        
+        .sun {
+            background: yellow;
+            width: 100px;
+            height: 100px;
+            top: 10%;
+            right: 10%;
+            box-shadow: 0 0 60px 20px rgba(255, 223, 0, 0.5);
+            animation: rotateSun 20s linear infinite;
+        }
+        
+        @keyframes rotateSun {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        /* Container */
+        
+        .container {
+            position: relative;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            text-align: center;
+            width: 380px;
+            color: #fff;
+            z-index: 10;
+            transition: transform 0.3s ease;
+        }
+        
+        .container:hover {
+            transform: scale(1.05);
+        }
+        
+        h1 {
+            margin-bottom: 20px;
+            font-size: 32px;
+            font-weight: 600;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        input {
+            width: 65%;
+            padding: 12px;
+            border-radius: 10px 0 0 10px;
+            border: none;
+            outline: none;
+            font-size: 16px;
+        }
+        
+        button {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 0 10px 10px 0;
+            background: linear-gradient(135deg, #6A82FB, #FC5C7D);
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        
+        button:hover {
+            background: linear-gradient(135deg, #FC5C7D, #6A82FB);
+        }
+        /* Weather Info */
+        
+        .weather-info {
+            margin-top: 30px;
+            animation: fadeIn 0.6s ease-in-out;
+        }
+        
+        .temp {
+            font-size: 50px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .condition {
+            font-size: 22px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        
+        .icon img {
+            width: 80px;
+            height: 80px;
+            animation: bounce 1s infinite alternate;
+        }
+        /* Animations */
+        
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes bounce {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(-10px);
+            }
+        }
+        /* Responsive */
+        
+        @media(max-width: 420px) {
+            .container {
+                width: 90%;
+                padding: 25px;
+            }
+            input {
+                width: 60%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Animated clouds and sun -->
+    <div class="cloud"></div>
+    <div class="cloud" style="top: 40%; animation-duration: 60s;"></div>
+    <div class="sun"></div>
+
+    <div class="container">
+        <h1>Weather App 🌤️</h1>
+        <div>
+            <input type="text" id="locationInput" placeholder="Enter location...">
+            <button onclick="getWeather()">Search</button>
+        </div>
+        <div class="weather-info" id="weatherInfo">
+            <!-- Weather data will appear here -->
+        </div>
+    </div>
+
+    <script>
+        async function getWeather() {
+            const location = document.getElementById("locationInput").value;
+            if (!location) {
+                alert("Please enter a location!");
+                return;
+            }
+
+            const apiKey = "e34716072b284575940103609251709";
+            const url = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${location}&aqi=yes`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.error) {
+                    document.getElementById("weatherInfo").innerHTML =
+                        `<p style="color: #ff6b6b;">${data.error.message}</p>`;
+                    return;
+                }
+
+                document.getElementById("weatherInfo").innerHTML = `
+                    <div class="temp">${data.current.temp_c}°C</div>
+                    <div class="condition">${data.current.condition.text}</div>
+                    <div class="icon">
+                        <img src="https:${data.current.condition.icon}" alt="Weather icon">
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById("weatherInfo").innerHTML =
+                    `<p style="color: #ff6b6b;">Unable to fetch weather. Try again!</p>`;
+            }
+        }
+    </script>
+</body>
+
+</html>
